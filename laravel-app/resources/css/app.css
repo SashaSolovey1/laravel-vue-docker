@@ -1,0 +1,18 @@
+@import "bootstrap";
+@import "node_modules/font-awesome/css/font-awesome.css";
+
+.replies{
+    width: 70%;
+    text-align: end;
+    margin-left: auto;
+}
+.repliesSpan{
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-weight: 900;
+}
+.replyBlock{
+    border: 1px solid;
+    margin: 0px;
+}
