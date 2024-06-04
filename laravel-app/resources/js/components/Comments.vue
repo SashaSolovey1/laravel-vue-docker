@@ -21,7 +21,7 @@
                         <h4>{{ comment.username }}</h4>
                         <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
                     </div>
-                    <p>{{ comment.text }}</p>
+                    <p v-html="comment.text"></p>
                     <div class="d-flex align-items-center">
                         <button @click="increaseRating(comment)" class="btn btn-sm btn-outline-success">
                             <i class="fa fa-thumbs-up"></i>
@@ -33,6 +33,22 @@
                         <button @click="replyToComment(comment.id)" class="btn btn-sm btn-outline-secondary">
                             Reply
                         </button>
+
+                        <!-- Добавление лайтбокса для изображений -->
+                        <template v-if="comment.file_path && isImage(comment.file_path)">
+                            <div class="attachment">
+                            <a class="example-image-link" :href="comment.file_path" data-lightbox="example-set">
+                                <img class="example-image" :src="comment.file_path" alt="Comment Image" style="max-width: 200px;">
+                            </a>
+                            </div>
+                        </template>
+                        <!-- Добавление ссылки на скачивание файла -->
+                        <template v-else-if="comment.file_path">
+                            <div class="attachment">
+                            <a :href="comment.file_path" download>Download File</a>
+                            </div>
+                        </template>
+
                     </div>
                     <span class="repliesSpan" v-if="comment.replies.length > 0">Replies</span>
                     <div v-if="comment.replies.length > 0" class="ml-4 replies">
@@ -41,7 +57,7 @@
                                 <h4>{{ reply.username }}</h4>
                                 <small class="text-muted">{{ new Date(reply.created_at).toLocaleString() }}</small>
                             </div>
-                            <p>{{ reply.text }}</p>
+                            <p v-html="reply.text"></p>
                             <div class="d-flex align-items-center">
                                 <button @click="increaseRating(reply)" class="btn btn-sm btn-outline-success">
                                     <i class="fa fa-thumbs-up"></i>
@@ -50,6 +66,21 @@
                                 <button @click="decreaseRating(reply)" class="btn btn-sm btn-outline-danger">
                                     <i class="fa fa-thumbs-down"></i>
                                 </button>
+
+                                <!-- Добавление лайтбокса для изображений -->
+                                <template v-if="reply.file_path && isImage(reply.file_path)">
+                                    <div class="attachment">
+                                        <a class="example-image-link" :href="reply.file_path" data-lightbox="example-set">
+                                            <img class="example-image" :src="reply.file_path" alt="Comment Image" style="max-width: 200px;">
+                                        </a>
+                                    </div>
+                                </template>
+                                <!-- Добавление ссылки на скачивание файла -->
+                                <template v-else-if="reply.file_path">
+                                    <div class="attachment">
+                                        <a :href="reply.file_path" download>Download File</a>
+                                    </div>
+                                </template>
 
                             </div>
                         </div>
@@ -81,6 +112,8 @@
 </template>
 
 <script>
+import 'lightbox2/dist/css/lightbox.min.css';
+import 'lightbox2/dist/js/lightbox-plus-jquery.js';
 export default {
     data() {
         return {
@@ -94,6 +127,12 @@ export default {
         this.loadComments();
     },
     methods: {
+        isImage(file_path) {
+            // Проверка на расширение файла для определения, является ли он изображением
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+            const ext = file_path.substring(file_path.lastIndexOf('.')).toLowerCase();
+            return imageExtensions.includes(ext);
+        },
         loadComments(url = `/api/comments?sortBy=${this.sortByField}&sortDirection=${this.sortDirection}`) {
             fetch(url)
                 .then(response => response.json())

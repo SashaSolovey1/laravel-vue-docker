@@ -86,14 +86,14 @@ class CommentController extends Controller
 
     public function validateComment(Request $request)
     {
-
-        $rules = [
-            'captcha' => 'required|captcha_api:' . request('key') . ',math',
+            $request->captcha = intval($request->captcha);
+            $rules = [
             'username' => 'required|string',
             'email' => 'required|email',
             'homepage' => 'nullable|url',
             'text' => 'required|string',
-            'file' => 'nullable|file|max:10240', // 10MB max size
+            'file' => 'sometimes|mimes:jpg,gif,png,txt|max:10240',
+            'captcha' => 'required|captcha_api:' . request('key') . ',math',
         ];
 
         $validator = validator()->make(request()->all(), $rules);
@@ -128,31 +128,49 @@ class CommentController extends Controller
             $user->save();
         }
 
-        // Handle file upload if present
         $filePath = null;
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filePath = $file->store('uploads/comments');
+
+            // Check if the file is an image
+            if (substr($file->getMimeType(), 0, 5) == 'image') {
+                $image = Image::make($file);
+
+                // Resize the image to a maximum of 320x240
+                $image->resize(320, 240, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+
+                // Save the image to storage
+                $filePath = 'comments/' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $image->save(storage_path('app/public/' . $filePath));
+            } else {
+                // Save the file without processing
+                $filePath = 'storage/' . $file->store('comments');
+            }
+        }
+
+        if($request->parent_id == 'null'){
+            $request->parent_id = NULL;
         }
 
         // Create the comment
         $comment = new Comment;
         $comment->user_id = $user->id;
-        if($request['parent_id']):
-        $comment->parent_id = $request['parent_id'];
-        endif;
-        $comment->home_page = $request['homepage'];
-        $comment->text = $request['text'];
+        $comment->parent_id = $request->parent_id;
+        $comment->home_page = $request->homepage;
+        $comment->text = $request->text;
         $comment->rating = 0;
         $comment->file_path = $filePath;
         $comment->created_at = now();
-        $comment->updated_at = null;
+        $comment->updated_at = NULL;
         $comment->save();
 
         // Log the created comment
         info('Created comment:', $comment->toArray());
 
-        return response()->json($comment, 201);
+        return response()->json("Коментарий сохранился", 201);
     }
 
     /**
