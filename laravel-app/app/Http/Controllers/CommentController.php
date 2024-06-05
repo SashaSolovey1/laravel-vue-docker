@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentCreated;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -9,6 +10,9 @@ use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Jobs\ProcessFile;
+use Illuminate\Support\Facades\Cache;
+
 
 class CommentController extends Controller
 {
@@ -22,60 +26,68 @@ class CommentController extends Controller
         $sortBy = $request->query('sortBy', 'created_at');
         $sortDirection = $request->query('sortDirection', 'desc');
 
-        $commentsQuery = Comment::with(['replies.user', 'user'])
-            ->whereNull('parent_id');
+        // Создание уникального ключа кэша на основе параметров запроса
+        $cacheKey = 'comments_' . $sortBy . '_' . $sortDirection . '_' . $request->query('page', 1);
 
-        // Добавление сортировки
-        if ($sortBy === 'username') {
-            $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
-                ->orderBy('users.username', $sortDirection);
-        } elseif ($sortBy === 'email') {
-            $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
-                ->orderBy('users.email', $sortDirection);
-        } else {
-            $commentsQuery->orderBy($sortBy, $sortDirection);
-        }
+        // Попытка получить данные из кэша
+        $comments = Cache::remember($cacheKey, 600, function () use ($sortBy, $sortDirection) {
+            $commentsQuery = Comment::with(['replies.user', 'user'])
+                ->whereNull('parent_id');
 
-        // Получение комментариев с пагинацией
-        $comments = $commentsQuery->paginate(25);
+            // Добавление сортировки
+            if ($sortBy === 'username') {
+                $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
+                    ->orderBy('users.username', $sortDirection);
+            } elseif ($sortBy === 'email') {
+                $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
+                    ->orderBy('users.email', $sortDirection);
+            } else {
+                $commentsQuery->orderBy($sortBy, $sortDirection);
+            }
 
-        // Преобразование коллекции комментариев
-        $comments->getCollection()->transform(function ($comment) {
-            $username = $comment->user ? $comment->user->username : 'Anonymous';
-            $email = $comment->user ? $comment->user->email : '';
+            // Получение комментариев с пагинацией
+            $comments = $commentsQuery->paginate(25);
 
-            // Трансформация ответов
-            $replies = $comment->replies->map(function ($reply) {
-                $replyUsername = $reply->user ? $reply->user->username : 'Anonymous';
-                $replyEmail = $reply->user ? $reply->user->email : '';
+            // Преобразование коллекции комментариев
+            $comments->getCollection()->transform(function ($comment) {
+                $username = $comment->user ? $comment->user->username : 'Anonymous';
+                $email = $comment->user ? $comment->user->email : '';
+
+                // Трансформация ответов
+                $replies = $comment->replies->map(function ($reply) {
+                    $replyUsername = $reply->user ? $reply->user->username : 'Anonymous';
+                    $replyEmail = $reply->user ? $reply->user->email : '';
+
+                    return [
+                        'id' => $reply->id,
+                        'user_id' => $reply->user_id,
+                        'username' => $replyUsername,
+                        'email' => $replyEmail,
+                        'parent_id' => $reply->parent_id,
+                        'text' => $reply->text,
+                        'rating' => $reply->rating,
+                        'file_path' => $reply->file_path,
+                        'created_at' => $reply->created_at,
+                        'updated_at' => $reply->updated_at,
+                    ];
+                });
 
                 return [
-                    'id' => $reply->id,
-                    'user_id' => $reply->user_id,
-                    'username' => $replyUsername,
-                    'email' => $replyEmail,
-                    'parent_id' => $reply->parent_id,
-                    'text' => $reply->text,
-                    'rating' => $reply->rating,
-                    'file_path' => $reply->file_path,
-                    'created_at' => $reply->created_at,
-                    'updated_at' => $reply->updated_at,
+                    'id' => $comment->id,
+                    'user_id' => $comment->user_id,
+                    'username' => $username,
+                    'email' => $email,
+                    'parent_id' => $comment->parent_id,
+                    'text' => $comment->text,
+                    'rating' => $comment->rating,
+                    'file_path' => $comment->file_path,
+                    'created_at' => $comment->created_at,
+                    'updated_at' => $comment->updated_at,
+                    'replies' => $replies,
                 ];
             });
 
-            return [
-                'id' => $comment->id,
-                'user_id' => $comment->user_id,
-                'username' => $username,
-                'email' => $email,
-                'parent_id' => $comment->parent_id,
-                'text' => $comment->text,
-                'rating' => $comment->rating,
-                'file_path' => $comment->file_path,
-                'created_at' => $comment->created_at,
-                'updated_at' => $comment->updated_at,
-                'replies' => $replies,
-            ];
+            return $comments;
         });
 
         // Возврат JSON-ответа с пагинацией и комментариями
@@ -117,10 +129,10 @@ class CommentController extends Controller
      */
     private function storeComment(Request $request)
     {
-        // Check if user with the given email exists
+        // Проверяем есть ли юзер с таким мейлом
         $user = User::where('email', $request['email'])->first();
 
-        // If user does not exist, create a new one
+        // Если пользователя нету - создаем
         if (!$user) {
             $user = new User;
             $user->username = $request['username'];
@@ -128,34 +140,18 @@ class CommentController extends Controller
             $user->save();
         }
 
+        // Создаем очередь для загрузки файла
         $filePath = null;
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-
-            // Check if the file is an image
-            if (substr($file->getMimeType(), 0, 5) == 'image') {
-                $image = Image::make($file);
-
-                // Resize the image to a maximum of 320x240
-                $image->resize(320, 240, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-
-                // Save the image to storage
-                $filePath = 'comments/' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $image->save(storage_path('app/public/' . $filePath));
-            } else {
-                // Save the file without processing
-                $filePath = 'storage/' . $file->store('comments');
-            }
+            ProcessUploadedFile::dispatch($file)->onQueue('file_processing');
         }
 
-        if($request->parent_id == 'null'){
+        if ($request->parent_id == 'null') {
             $request->parent_id = NULL;
         }
 
-        // Create the comment
+        // Создаем коммент
         $comment = new Comment;
         $comment->user_id = $user->id;
         $comment->parent_id = $request->parent_id;
@@ -167,10 +163,16 @@ class CommentController extends Controller
         $comment->updated_at = NULL;
         $comment->save();
 
-        // Log the created comment
+        // Чистим кэш
+        Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
+
+        //Создаем ивент коммента
+        event(new CommentCreated($comment));
+
+
         info('Created comment:', $comment->toArray());
 
-        return response()->json("Коментарий сохранился", 201);
+        return response()->json("Comment saved", 201);
     }
 
     /**

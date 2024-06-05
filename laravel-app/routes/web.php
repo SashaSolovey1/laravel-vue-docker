@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CaptchaController;
+use App\Http\Controllers\TestEmailController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,4 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/send-test-email', [TestEmailController::class, 'sendTestEmail']);
 
