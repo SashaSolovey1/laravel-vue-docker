@@ -37,15 +37,15 @@
                         <!-- Добавление лайтбокса для изображений -->
                         <template v-if="comment.file_path && isImage(comment.file_path)">
                             <div class="attachment">
-                            <a class="example-image-link" :href="comment.file_path" data-lightbox="example-set">
-                                <img class="example-image" :src="comment.file_path" alt="Comment Image" style="max-width: 200px;">
-                            </a>
+                                <a class="example-image-link" :href="comment.file_path" data-lightbox="example-set">
+                                    <img class="example-image" :src="comment.file_path" alt="Comment Image" style="max-width: 200px;">
+                                </a>
                             </div>
                         </template>
                         <!-- Добавление ссылки на скачивание файла -->
                         <template v-else-if="comment.file_path">
                             <div class="attachment">
-                            <a :href="comment.file_path" download>Download File</a>
+                                <a :href="comment.file_path" download>Download File</a>
                             </div>
                         </template>
 
@@ -114,6 +114,9 @@
 <script>
 import 'lightbox2/dist/css/lightbox.min.css';
 import 'lightbox2/dist/js/lightbox-plus-jquery.js';
+import Echo from 'laravel-echo';
+window.io = require('socket.io-client');
+
 export default {
     data() {
         return {
@@ -125,6 +128,7 @@ export default {
     },
     created() {
         this.loadComments();
+        this.listenForNewComments();
     },
     methods: {
         isImage(file_path) {
@@ -198,7 +202,14 @@ export default {
         },
         replyToComment(parentId) {
             this.$emit('setParentId', parentId);
+        },
+        listenForNewComments() {
+            window.Echo.channel('comments')
+                .listen('CommentCreated', (event) => {
+                    this.comments.push(event.comment);
+                });
         }
     },
 };
 </script>
+

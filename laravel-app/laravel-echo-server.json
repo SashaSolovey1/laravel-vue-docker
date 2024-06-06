@@ -2,9 +2,12 @@
 	"authHost": "http://localhost",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [],
-	"database": "sqlite",
+	"database": "redis",
 	"databaseConfig": {
-		"redis": {},
+        "redis" : {
+            "port": "6379",
+            "host": "bsn.test"
+        },
 		"sqlite": {
 			"databasePath": "/database/laravel-echo-server.sqlite"
 		}

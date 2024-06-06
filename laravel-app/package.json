@@ -14,6 +14,7 @@
         "vite": "^5.0.0"
     },
     "dependencies": {
+        "@soketi/soketi": "github:soketi/soketi",
         "bootstrap": "^5.3.3",
         "font-awesome": "^4.7.0",
         "jquery": "^3.7.1",
@@ -21,6 +22,7 @@
         "socket.io-client": "^4.7.5",
         "vue": "^3.4.27",
         "vue-loader": "^17.4.2",
-        "vue-router": "^4.3.2"
+        "vue-router": "^4.3.2",
+        "vue-socket.io": "^3.0.10"
     }
 }

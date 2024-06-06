@@ -1,4 +1,5 @@
 <template>
+
     <div class="container mt-5">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
@@ -91,6 +92,8 @@
 <script>
 import axios from 'axios';
 import Comments from '../components/Comments.vue';
+import io from 'socket.io-client';
+
 
 export default {
     name: 'App',

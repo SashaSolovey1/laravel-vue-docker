@@ -169,6 +169,8 @@ class CommentController extends Controller
         //Создаем ивент коммента
         event(new CommentCreated($comment));
 
+        broadcast(new CommentCreated($comment))->toOthers();
+
 
         info('Created comment:', $comment->toArray());
 
