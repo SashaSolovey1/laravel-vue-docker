@@ -3,19 +3,6 @@
 use function Livewire\Volt\{state, computed};
 use Illuminate\Support\Facades\Redis;
 
-$liveUsers = computed(function () {
-    $count = 0;
-    $cursor = null;
-    $pattern = 'live_users:*';
-
-    do {
-        list($cursor, $keys) = Redis::scan($cursor, $pattern, 1000);
-        $count += count($keys ?? []);
-    } while ($cursor != 0);
-
-    return $count;
-});
-
 
 ?>
 <div>
@@ -35,7 +22,6 @@ $liveUsers = computed(function () {
                     <p class="ml-16 truncate text-sm font-medium text-gray-500">Live Now</p>
                 </dt>
                 <dd class="ml-16 flex items-baseline">
-                    <p class="text-2xl font-semibold text-gray-900">{{ number_format($this->liveUsers, 0) }}</p>
                 </dd>
             </div>
         </dl>

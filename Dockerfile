@@ -1,4 +1,4 @@
-FROM php:8.1.0-apache
+FROM php:8.3.6-apache
 WORKDIR /var/www/html
 
 # Mod Rewrite
