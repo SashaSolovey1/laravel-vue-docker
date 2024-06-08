@@ -77,9 +77,11 @@
     </div>
 </template>
 
-<script>
+<script type="module">
 import axios from 'axios';
+import Echo from "laravel-echo";
 import Comments from '../components/Comments.vue';
+
 
 export default {
     name: 'App',
@@ -232,9 +234,10 @@ export default {
             return fileType.startsWith('image/');
         },
         listenForNewComments() {
-            window.Echo.channel('comments')
+            Echo.channel('comments')
                 .listen('CommentCreated', (e) => {
                     this.newComments.push(e.comment);
+			console.log(e)
                 });
         }
     }
