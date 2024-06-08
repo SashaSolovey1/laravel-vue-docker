@@ -128,41 +128,38 @@ class CommentController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-private function storeComment(Request $request)
-{
-    // Перевірка існування юзера з таким мейлом
-    $user = User::firstOrCreate(
-        ['email' => $request['email']],
-        ['username' => $request['username']]
-    );
+    private function storeComment(Request $request)
+    {
+        $user = User::firstOrCreate(
+            ['email' => $request['email']],
+            ['username' => $request['username']]
+        );
 
-    $filePath = null;
-    if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-        $filePath = 'comments/' . $fileName;
-        $file->storeAs('comments', $fileName);
+        $filePath = null;
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $filePath = 'comments/' . $fileName;
+            $file->storeAs('comments', $fileName);
+        }
+
+        $comment = new Comment;
+        $comment->user_id = $user->id;
+        $comment->parent_id = $request->parent_id == 'null' ? null : $request->parent_id;
+        $comment->home_page = $request->homepage;
+        $comment->text = $request->text;
+        $comment->rating = 0;
+        $comment->file_path = $filePath;
+        $comment->created_at = now();
+        $comment->save();
+
+        Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
+
+        event(new CommentCreated($comment));
+        broadcast(new CommentCreated($comment))->toOthers();
+
+        return response()->json("Comment saved", 201);
     }
-
-    $comment = new Comment;
-    $comment->user_id = $user->id;
-    $comment->parent_id = $request->parent_id == 'null' ? null : $request->parent_id;
-    $comment->home_page = $request->homepage;
-    $comment->text = $request->text;
-    $comment->rating = 0;
-    $comment->file_path = $filePath;
-    $comment->created_at = now();
-    $comment->save();
-
-    // Очищення кешу
-    Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
-
-    // Створення івенту
-    event(new CommentCreated($comment));
-    broadcast(new CommentCreated($comment))->toOthers();
-
-    return response()->json("Comment saved", 201);
-}
 
 
     /**

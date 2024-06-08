@@ -43,8 +43,6 @@
                         <button @click="replyToComment(comment.id)" class="btn btn-sm btn-outline-secondary">
                             Reply
                         </button>
-
-                        <!-- Добавление лайтбокса для изображений -->
                         <template v-if="comment.file_path && isImage(comment.file_path)">
                             <div class="attachment">
                                 <a class="example-image-link" :href="comment.file_path" data-lightbox="example-set">
@@ -52,13 +50,11 @@
                                 </a>
                             </div>
                         </template>
-                        <!-- Добавление ссылки на скачивание файла -->
                         <template v-else-if="comment.file_path">
                             <div class="attachment">
                                 <a :href="comment.file_path" download>Download File</a>
                             </div>
                         </template>
-
                     </div>
                     <span class="repliesSpan" v-if="comment.replies.length > 0">Replies</span>
                     <div v-if="comment.replies.length > 0" class="ml-4 replies">
@@ -76,8 +72,6 @@
                                 <button @click="decreaseRating(reply)" class="btn btn-sm btn-outline-danger">
                                     <i class="fa fa-thumbs-down"></i>
                                 </button>
-
-                                <!-- Добавление лайтбокса для изображений -->
                                 <template v-if="reply.file_path && isImage(reply.file_path)">
                                     <div class="attachment">
                                         <a class="example-image-link" :href="reply.file_path" data-lightbox="example-set">
@@ -85,13 +79,11 @@
                                         </a>
                                     </div>
                                 </template>
-                                <!-- Добавление ссылки на скачивание файла -->
                                 <template v-else-if="reply.file_path">
                                     <div class="attachment">
                                         <a :href="reply.file_path" download>Download File</a>
                                     </div>
                                 </template>
-
                             </div>
                         </div>
                     </div>
@@ -101,7 +93,6 @@
         </div>
         <nav aria-label="Page navigation example" v-if="pagination.last_page > 1">
             <ul class="pagination">
-
                 <li v-for="page in pagination.links" :key="page.label" class="page-item" :class="{ active: page.active, disabled: !page.url }">
                     <a class="page-link" @click.prevent="loadComments(page.url)" href="#">
                         <span v-if="page.label === '&laquo; Previous'">
@@ -115,7 +106,6 @@
                         </span>
                     </a>
                 </li>
-
             </ul>
         </nav>
     </div>
@@ -124,6 +114,7 @@
 <script>
 import 'lightbox2/dist/css/lightbox.min.css';
 import 'lightbox2/dist/js/lightbox-plus-jquery.js';
+
 export default {
     props: {
         newComments: Array
@@ -141,7 +132,6 @@ export default {
     },
     methods: {
         isImage(file_path) {
-            // Проверка на расширение файла для определения, является ли он изображением
             const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
             const ext = file_path.substring(file_path.lastIndexOf('.')).toLowerCase();
             return imageExtensions.includes(ext);
