@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('comments', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('comments', function () {
+    return true;
 });

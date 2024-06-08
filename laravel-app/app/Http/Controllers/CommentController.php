@@ -127,55 +127,43 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    private function storeComment(Request $request)
-    {
-        // Проверяем есть ли юзер с таким мейлом
-        $user = User::where('email', $request['email'])->first();
 
-        // Если пользователя нету - создаем
-        if (!$user) {
-            $user = new User;
-            $user->username = $request['username'];
-            $user->email = $request['email'];
-            $user->save();
-        }
+private function storeComment(Request $request)
+{
+    // Перевірка існування юзера з таким мейлом
+    $user = User::firstOrCreate(
+        ['email' => $request['email']],
+        ['username' => $request['username']]
+    );
 
-        // Создаем очередь для загрузки файла
-        $filePath = null;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            ProcessUploadedFile::dispatch($file)->onQueue('file_processing');
-        }
-
-        if ($request->parent_id == 'null') {
-            $request->parent_id = NULL;
-        }
-
-        // Создаем коммент
-        $comment = new Comment;
-        $comment->user_id = $user->id;
-        $comment->parent_id = $request->parent_id;
-        $comment->home_page = $request->homepage;
-        $comment->text = $request->text;
-        $comment->rating = 0;
-        $comment->file_path = $filePath;
-        $comment->created_at = now();
-        $comment->updated_at = NULL;
-        $comment->save();
-
-        // Чистим кэш
-        Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
-
-        //Создаем ивент коммента
-        event(new CommentCreated($comment));
-
-        broadcast(new CommentCreated($comment))->toOthers();
-
-
-        info('Created comment:', $comment->toArray());
-
-        return response()->json("Comment saved", 201);
+    $filePath = null;
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+        $filePath = 'comments/' . $fileName;
+        $file->storeAs('comments', $fileName);
     }
+
+    $comment = new Comment;
+    $comment->user_id = $user->id;
+    $comment->parent_id = $request->parent_id == 'null' ? null : $request->parent_id;
+    $comment->home_page = $request->homepage;
+    $comment->text = $request->text;
+    $comment->rating = 0;
+    $comment->file_path = $filePath;
+    $comment->created_at = now();
+    $comment->save();
+
+    // Очищення кешу
+    Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
+
+    // Створення івенту
+    event(new CommentCreated($comment));
+    broadcast(new CommentCreated($comment))->toOthers();
+
+    return response()->json("Comment saved", 201);
+}
+
 
     /**
      * Increase the rating of the specified resource in storage.

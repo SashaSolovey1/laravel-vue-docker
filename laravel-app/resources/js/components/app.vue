@@ -1,5 +1,4 @@
 <template>
-
     <div class="container mt-5">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
@@ -83,17 +82,15 @@
         </div>
     </div>
     <div id="app">
-        <Comments @setParentId="setParentId" />
+        <Comments @setParentId="setParentId" :newComments="newComments" />
     </div>
 </template>
-
-
 
 <script>
 import axios from 'axios';
 import Comments from '../components/Comments.vue';
-import io from 'socket.io-client';
-
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 export default {
     name: 'App',
@@ -117,7 +114,8 @@ export default {
             previewData: {
                 text: '',
                 file: null
-            }
+            },
+            newComments: []
         }
     },
     computed: {
@@ -131,6 +129,7 @@ export default {
             const response = await axios.get(`/api/comments/${this.$route.params.id}`);
             this.comment = response.data;
         }
+        this.listenForNewComments();
     },
     methods: {
         async insertTag(openTag, closeTag) {
@@ -244,11 +243,20 @@ export default {
         },
         isImage(fileType) {
             return fileType.startsWith('image/');
+        },
+        listenForNewComments() {
+            window.Echo = new Echo({
+                broadcaster: 'pusher',
+                key: process.env.MIX_PUSHER_APP_KEY,
+                cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+                encrypted: true
+            });
+
+            window.Echo.channel('comments')
+                .listen('CommentCreated', (e) => {
+                    this.newComments.push(e.comment);
+                });
         }
     }
 };
 </script>
-
-
-
-

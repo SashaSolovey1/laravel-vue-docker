@@ -1,6 +1,5 @@
 import  { createRouter, createWebHistory} from "vue-router";
 
-import form from "../components/Form.vue"
 import comments from "../components/Comments.vue";
 
 const routes = [
@@ -9,7 +8,6 @@ const routes = [
         name: "Home",
         components: {
             default: comments,
-            form: form,
         },
     },
 ];

@@ -18,8 +18,6 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'file'),
-
     /*
     |--------------------------------------------------------------------------
     | Session Lifetime
@@ -211,4 +209,6 @@ return [
 
     'partitioned' => false,
 
+'driver' => env('SESSION_DRIVER', 'redis'),
+'connection' => 'default',
 ];

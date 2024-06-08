@@ -16,6 +16,16 @@
                 </div>
             </div>
             <div class="card-body">
+                <div v-if="newComments.length" class="alert alert-info">
+                    <h4>New Comments</h4>
+                    <div v-for="comment in newComments" :key="comment.id" class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4>{{ comment.username }}</h4>
+                            <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
+                        </div>
+                        <p v-html="comment.text"></p>
+                    </div>
+                </div>
                 <div v-for="comment in comments" :key="comment.id" class="mb-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4>{{ comment.username }}</h4>
@@ -114,10 +124,10 @@
 <script>
 import 'lightbox2/dist/css/lightbox.min.css';
 import 'lightbox2/dist/js/lightbox-plus-jquery.js';
-import Echo from 'laravel-echo';
-window.io = require('socket.io-client');
-
 export default {
+    props: {
+        newComments: Array
+    },
     data() {
         return {
             comments: [],
@@ -128,7 +138,6 @@ export default {
     },
     created() {
         this.loadComments();
-        this.listenForNewComments();
     },
     methods: {
         isImage(file_path) {
@@ -202,14 +211,7 @@ export default {
         },
         replyToComment(parentId) {
             this.$emit('setParentId', parentId);
-        },
-        listenForNewComments() {
-            window.Echo.channel('comments')
-                .listen('CommentCreated', (event) => {
-                    this.comments.push(event.comment);
-                });
         }
     },
 };
 </script>
-
