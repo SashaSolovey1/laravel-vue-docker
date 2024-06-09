@@ -153,10 +153,11 @@ class CommentController extends Controller
         $comment->created_at = now();
         $comment->save();
 
+        event(new CommentCreated($request->get('comment')));
+
+
         Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
 
-        event(new CommentCreated($comment));
-        broadcast(new CommentCreated($comment))->toOthers();
 
         return response()->json("Comment saved", 201);
     }

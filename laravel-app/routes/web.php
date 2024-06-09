@@ -3,6 +3,7 @@
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\TestEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Events\CommentCreated;
 
 /*
 |--------------------------------------------------------------------------

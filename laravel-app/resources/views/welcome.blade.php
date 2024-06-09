@@ -6,6 +6,8 @@
 
         <title>Laravel</title>
 
+	<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />

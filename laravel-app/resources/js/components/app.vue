@@ -9,6 +9,7 @@
                     Ответ на комментарий: "{{ replyingToComment.text.substring(0, 20) }}..."
                 </div>
                 <form @submit.prevent="submitForm" enctype="multipart/form-data">
+                    <!-- Other form fields -->
                     <div class="mb-3">
                         <label for="username" class="form-label">UserName</label>
                         <input type="text" v-model="comment.username" id="username" class="form-control" placeholder="Enter your username" required />
@@ -35,21 +36,29 @@
                         <label for="file" class="form-label">File (Max 10MB)</label>
                         <input name="file" type="file" ref="file" id="file" class="form-control" @change="handleFileChange" />
                     </div>
+
+                    <!-- CAPTCHA -->
                     <div class="mb-3">
                         <label for="captcha" class="form-label">Captcha</label>
                         <img :src="captchaImage" alt="CAPTCHA Image" class="mb-2" @click="loadCaptcha" style="cursor: pointer;" />
                         <input type="text" v-model="captcha" id="captcha" class="form-control" placeholder="Enter CAPTCHA" required />
                         <input type="hidden" v-model="captchaKey" id="captchaKey" name="key" />
                     </div>
+
+                    <!-- Error message display -->
                     <div v-if="errorMessage" class="alert alert-danger">
                         {{ errorMessage }}
                     </div>
+
+                    <!-- Preview Button -->
                     <button type="button" class="btn btn-secondary me-2" @click="previewMessage" data-bs-toggle="modal" data-bs-target="#previewModal">Preview</button>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Preview Modal -->
     <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -73,14 +82,16 @@
         </div>
     </div>
     <div id="app">
-        <Comments @setParentId="setParentId" :newComments="newComments" />
+        <Comments @setParentId="setParentId" />
     </div>
 </template>
 
-<script type="module">
+
+
+<script>
 import axios from 'axios';
-import Echo from "laravel-echo";
 import Comments from '../components/Comments.vue';
+import io from 'socket.io-client'; // Import Socket.io client
 
 
 export default {
@@ -105,32 +116,30 @@ export default {
             previewData: {
                 text: '',
                 file: null
-            },
-            newComments: []
+            }
+        }
+    },
+    computed: {
+        isNewComment() {
+            return !this.$route.path.includes('edit');
         }
     },
     async created() {
         await this.loadCaptcha();
-        this.listenForNewComments();
+        if (!this.isNewComment) {
+            const response = await axios.get(`/api/comments/${this.$route.params.id}`);
+            this.comment = response.data;
+        }
     },
     methods: {
         async insertTag(openTag, closeTag) {
-            const textarea = this.$refs.text;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            const before = text.substring(0, start);
-            const after = text.substring(end, text.length);
-            textarea.value = before + openTag + text.substring(start, end) + closeTag + after;
-            textarea.focus();
-            textarea.selectionStart = start + openTag.length;
-            textarea.selectionEnd = end + openTag.length;
+            this.$refs.text.value += openTag + ' ' + closeTag;
         },
         async loadCaptcha() {
             try {
                 const response = await axios.get('/captcha/api/math');
                 this.captchaImage = response.data.img;
-                this.captchaKey = response.data.key;
+                this.captchaKey = response.data.key; // Assuming the response includes the key
             } catch (error) {
                 console.error('Error loading CAPTCHA:', error);
             }
@@ -144,10 +153,12 @@ export default {
                 formData.append('text', this.comment.text);
                 formData.append('parent_id', this.comment.parent_id);
                 formData.append('captcha', this.captcha);
-                formData.append('key', this.captchaKey);
+                formData.append('key', this.captchaKey); // Pass the CAPTCHA key
                 if (this.$refs.file.files[0]) {
                     formData.append('file', this.$refs.file.files[0]);
                 }
+
+                console.log(formData);
 
                 const response = await axios.post('/api/comments/validate', formData);
                 this.$router.push('/');
@@ -232,13 +243,6 @@ export default {
         },
         isImage(fileType) {
             return fileType.startsWith('image/');
-        },
-        listenForNewComments() {
-            Echo.channel('comments')
-                .listen('CommentCreated', (e) => {
-                    this.newComments.push(e.comment);
-			console.log(e)
-                });
         }
     }
 };

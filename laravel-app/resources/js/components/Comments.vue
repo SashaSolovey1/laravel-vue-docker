@@ -16,19 +16,9 @@
                 </div>
             </div>
             <div class="card-body">
-                <div v-if="newComments.length" class="alert alert-info">
-                    <h4>New Comments</h4>
-                    <div v-for="comment in newComments" :key="comment.id" class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h4>{{ comment.username }}</h4>
-                            <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
-                        </div>
-                        <p v-html="comment.text"></p>
-                    </div>
-                </div>
                 <div v-for="comment in comments" :key="comment.id" class="mb-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4>{{ comment.username }}</h4>
+                        <h4>{{ comment.username }} <span v-if="comment.isNew" class="badge badge-success">Новый комментарий</span></h4>
                         <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
                     </div>
                     <p v-html="comment.text"></p>
@@ -114,11 +104,9 @@
 <script>
 import 'lightbox2/dist/css/lightbox.min.css';
 import 'lightbox2/dist/js/lightbox-plus-jquery.js';
+import echo from '../bootstrap'; // Assuming bootstrap.js is in the parent directory
 
 export default {
-    props: {
-        newComments: Array
-    },
     data() {
         return {
             comments: [],
@@ -201,7 +189,13 @@ export default {
         },
         replyToComment(parentId) {
             this.$emit('setParentId', parentId);
-        }
+        },
     },
+        mounted() {
+	  Echo.channel('comments')
+                .listen('.newComment', (comment) => {
+                    console.log('New comment created:', comment);
+                });
+        }
 };
 </script>

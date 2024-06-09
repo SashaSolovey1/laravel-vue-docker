@@ -2,35 +2,37 @@
 
 namespace App\Events;
 
-use App\Models\Comment;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class CommentCreated implements ShouldBroadcast
 {
-    use InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $comment;
+    protected $comment;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct(Comment $comment)
+    public function __construct($comment)
     {
         $this->comment = $comment;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel
-     */
+    public function broadcastWith()
+    {
+        return [
+            'comment' => $this->comment,
+        ];
+    }
+
+    public function broadcastAs()
+    {
+        return 'newComment';
+    }
+
     public function broadcastOn()
     {
         return new Channel('comments');
