@@ -22,78 +22,79 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        $sortBy = $request->query('sortBy', 'created_at');
-        $sortDirection = $request->query('sortDirection', 'desc');
 
-        // Создание уникального ключа кэша на основе параметров запроса
-        $cacheKey = 'comments_' . $sortBy . '_' . $sortDirection . '_' . $request->query('page', 1);
+public function index(Request $request)
+{
+    $sortBy = $request->query('sortBy', 'created_at');
+    $sortDirection = $request->query('sortDirection', 'desc');
 
-        // Попытка получить данные из кэша
-        $comments = Cache::remember($cacheKey, 600, function () use ($sortBy, $sortDirection) {
-            $commentsQuery = Comment::with(['replies.user', 'user'])
-                ->whereNull('parent_id');
+    // Создание уникального ключа кэша на основе параметров запроса
+    $cacheKey = 'comments_' . $sortBy . '_' . $sortDirection . '_' . $request->query('page', 1);
 
-            // Добавление сортировки
-            if ($sortBy === 'username') {
-                $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
-                    ->orderBy('users.username', $sortDirection);
-            } elseif ($sortBy === 'email') {
-                $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
-                    ->orderBy('users.email', $sortDirection);
-            } else {
-                $commentsQuery->orderBy($sortBy, $sortDirection);
-            }
+    // Попытка получить данные из кэша
+    $comments = Cache::remember($cacheKey, 600, function () use ($sortBy, $sortDirection) {
+        $commentsQuery = Comment::with(['replies.user', 'user', 'media', 'replies.media'])
+            ->whereNull('parent_id');
 
-            // Получение комментариев с пагинацией
-            $comments = $commentsQuery->paginate(25);
+        // Добавление сортировки
+        if ($sortBy === 'username') {
+            $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
+                ->orderBy('users.username', $sortDirection);
+        } elseif ($sortBy === 'email') {
+            $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
+                ->orderBy('users.email', $sortDirection);
+        } else {
+            $commentsQuery->orderBy($sortBy, $sortDirection);
+        }
 
-            // Преобразование коллекции комментариев
-            $comments->getCollection()->transform(function ($comment) {
-                $username = $comment->user ? $comment->user->username : 'Anonymous';
-                $email = $comment->user ? $comment->user->email : '';
+        // Получение комментариев с пагинацией
+        $comments = $commentsQuery->paginate(25);
 
-                // Трансформация ответов
-                $replies = $comment->replies->map(function ($reply) {
-                    $replyUsername = $reply->user ? $reply->user->username : 'Anonymous';
-                    $replyEmail = $reply->user ? $reply->user->email : '';
+        // Преобразование коллекции комментариев
+        $comments->getCollection()->transform(function ($comment) {
+            $username = $comment->user ? $comment->user->username : 'Anonymous';
+            $email = $comment->user ? $comment->user->email : '';
 
-                    return [
-                        'id' => $reply->id,
-                        'user_id' => $reply->user_id,
-                        'username' => $replyUsername,
-                        'email' => $replyEmail,
-                        'parent_id' => $reply->parent_id,
-                        'text' => $reply->text,
-                        'rating' => $reply->rating,
-                        'file_path' => $reply->file_path,
-                        'created_at' => $reply->created_at,
-                        'updated_at' => $reply->updated_at,
-                    ];
-                });
+            // Трансформация ответов
+            $replies = $comment->replies->map(function ($reply) {
+                $replyUsername = $reply->user ? $reply->user->username : 'Anonymous';
+                $replyEmail = $reply->user ? $reply->user->email : '';
 
                 return [
-                    'id' => $comment->id,
-                    'user_id' => $comment->user_id,
-                    'username' => $username,
-                    'email' => $email,
-                    'parent_id' => $comment->parent_id,
-                    'text' => $comment->text,
-                    'rating' => $comment->rating,
-                    'file_path' => $comment->file_path,
-                    'created_at' => $comment->created_at,
-                    'updated_at' => $comment->updated_at,
-                    'replies' => $replies,
+                    'id' => $reply->id,
+                    'user_id' => $reply->user_id,
+                    'username' => $replyUsername,
+                    'email' => $replyEmail,
+                    'parent_id' => $reply->parent_id,
+                    'text' => $reply->text,
+                    'rating' => $reply->rating,
+                    'file_path' => $reply->getFirstMediaUrl('images', 'thumb'),
+                    'created_at' => $reply->created_at,
+                    'updated_at' => $reply->updated_at,
                 ];
             });
 
-            return $comments;
+            return [
+                'id' => $comment->id,
+                'user_id' => $comment->user_id,
+                'username' => $username,
+                'email' => $email,
+                'parent_id' => $comment->parent_id,
+                'text' => $comment->text,
+                'rating' => $comment->rating,
+                'file_path' => $comment->getFirstMediaUrl('images', 'thumb'),
+                'created_at' => $comment->created_at,
+                'updated_at' => $comment->updated_at,
+                'replies' => $replies,
+            ];
         });
 
-        // Возврат JSON-ответа с пагинацией и комментариями
-        return response()->json($comments);
-    }
+        return $comments;
+    });
+
+    // Возврат JSON-ответа с пагинацией и комментариями
+    return response()->json($comments);
+}
 
 
 
