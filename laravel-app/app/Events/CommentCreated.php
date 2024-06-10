@@ -4,21 +4,24 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CommentNotification;
 
 class CommentCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected $comment;
+    public $comment;
 
     public function __construct($comment)
     {
         $this->comment = $comment;
+        
+        // Отправка мейла
+        Mail::to('solo160103@gmail.com')->send(new CommentNotification($comment));
     }
 
     public function broadcastWith()
@@ -26,11 +29,6 @@ class CommentCreated implements ShouldBroadcast
         return [
             'comment' => $this->comment,
         ];
-    }
-
-    public function broadcastAs()
-    {
-        return 'newComment';
     }
 
     public function broadcastOn()

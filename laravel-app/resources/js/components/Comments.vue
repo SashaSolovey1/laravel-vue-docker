@@ -105,7 +105,6 @@
 import 'lightbox2/dist/css/lightbox.min.css';
 import 'lightbox2/dist/js/lightbox-plus-jquery.js';
 import echo from '../bootstrap'; // Assuming bootstrap.js is in the parent directory
-
 export default {
     data() {
         return {
@@ -193,9 +192,10 @@ export default {
     },
         mounted() {
 	  Echo.channel('comments')
-                .listen('.newComment', (comment) => {
+                .listen('CommentCreated', (comment) => {
                     console.log('New comment created:', comment);
                 });
+
         }
 };
 </script>

@@ -153,7 +153,8 @@ class CommentController extends Controller
         $comment->created_at = now();
         $comment->save();
 
-        event(new CommentCreated($request->get('comment')));
+	//трансляция по вебсокету и отправка мейла
+        event(new CommentCreated($comment));
 
 
         Cache::forget('comments_' . 'created_at' . '_desc' . '_1');

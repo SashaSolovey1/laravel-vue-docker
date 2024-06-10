@@ -1,0 +1,6 @@
+  2024-06-10 12:18:13 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 12:18:14 App\Events\CommentCreated ................ 316.15ms DONE
+  2024-06-10 12:20:30 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 12:20:31 App\Events\CommentCreated ................ 324.19ms DONE
+  2024-06-10 12:24:46 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 12:24:46 App\Events\CommentCreated ................ 362.50ms DONE

@@ -91,7 +91,6 @@
 <script>
 import axios from 'axios';
 import Comments from '../components/Comments.vue';
-import io from 'socket.io-client'; // Import Socket.io client
 
 
 export default {
