@@ -2,7 +2,7 @@
     <div class="container mt-5">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
-                <h3>Contact Form</h3>
+                <h3>Форма комментария</h3>
             </div>
             <div class="card-body">
                 <div v-if="replyingToComment" class="alert alert-secondary" role="alert">

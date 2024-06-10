@@ -20,3 +20,4 @@ window.Echo = new Echo({
     forceTLS: true,
     encrypted: true
 });
+export default window.Echo;

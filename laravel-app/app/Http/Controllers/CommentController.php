@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentRatingChanged;
 use App\Events\CommentCreated;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -128,41 +129,49 @@ class CommentController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    private function storeComment(Request $request)
-    {
-        $user = User::firstOrCreate(
-            ['email' => $request['email']],
-            ['username' => $request['username']]
-        );
+public function storeComment(Request $request)
+{
+    $user = User::firstOrCreate(
+        ['email' => $request['email']],
+        ['username' => $request['username']]
+    );
 
-        $filePath = null;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-            $filePath = 'comments/' . $fileName;
-            $file->storeAs('comments', $fileName);
+    $comment = new Comment;
+    $comment->user_id = $user->id;
+    $comment->parent_id = $request->parent_id == 'null' ? null : $request->parent_id;
+    $comment->home_page = $request->homepage;
+    $comment->text = $request->text;
+    $comment->rating = 0;
+    $comment->created_at = now();
+
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
+        $allowedImageExtensions = ['jpg', 'gif', 'png'];
+        $allowedTextExtensions = ['txt'];
+
+        if (in_array($extension, $allowedImageExtensions)) {
+            // Сохраняем изображение и уменьшаем его размер
+            $comment->addMedia($file)
+                ->toMediaCollection('images');
+        } elseif (in_array($extension, $allowedTextExtensions) && $file->getSize() <= 102400) {
+            // Сохраняем текстовый файл
+            $comment->addMedia($file)
+                ->toMediaCollection('files');
+        } else {
+            return response()->json("Invalid file type or size", 400);
         }
-
-        $comment = new Comment;
-        $comment->user_id = $user->id;
-        $comment->parent_id = $request->parent_id == 'null' ? null : $request->parent_id;
-        $comment->home_page = $request->homepage;
-        $comment->text = $request->text;
-        $comment->rating = 0;
-        $comment->file_path = $filePath;
-        $comment->created_at = now();
-        $comment->save();
-
-	//трансляция по вебсокету и отправка мейла
-        event(new CommentCreated($comment));
-
-
-        Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
-
-
-        return response()->json("Comment saved", 201);
     }
 
+    $comment->save();
+
+    // Трансляция по вебсокету и отправка мейла
+    event(new CommentCreated($comment));
+
+    Cache::forget('comments_' . 'created_at' . '_desc' . '_1');
+
+    return response()->json("Comment saved", 201);
+}
 
     /**
      * Increase the rating of the specified resource in storage.
@@ -174,6 +183,8 @@ class CommentController extends Controller
     public function increaseRating(Request $request, Comment $comment)
     {
         $comment->increment('rating');
+
+        event(new CommentRatingChanged($comment));
 
         return response()->json($comment, 200);
     }
@@ -188,6 +199,8 @@ class CommentController extends Controller
     public function decreaseRating(Request $request, Comment $comment)
     {
         $comment->decrement('rating');
+
+	event(new CommentRatingChanged($comment));
 
         return response()->json($comment, 200);
     }

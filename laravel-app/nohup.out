@@ -4,3 +4,75 @@
   2024-06-10 12:20:31 App\Events\CommentCreated ................ 324.19ms DONE
   2024-06-10 12:24:46 App\Events\CommentCreated ...................... RUNNING
   2024-06-10 12:24:46 App\Events\CommentCreated ................ 362.50ms DONE
+  2024-06-10 13:04:24 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:04:25 App\Events\CommentCreated ................ 298.94ms DONE
+  2024-06-10 13:20:08 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:20:08 App\Events\CommentCreated ................ 290.31ms DONE
+  2024-06-10 13:21:50 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:21:50 App\Events\CommentCreated ................ 274.44ms DONE
+  2024-06-10 13:24:26 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:24:27 App\Events\CommentCreated ................ 309.43ms DONE
+  2024-06-10 13:45:09 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:45:10 App\Events\CommentCreated ................ 298.88ms DONE
+  2024-06-10 13:46:28 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 13:46:28 App\Events\CommentCreated ................ 314.56ms DONE
+  2024-06-10 14:23:27 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:23:27 App\Events\CommentCreated ................ 305.25ms DONE
+  2024-06-10 14:23:48 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:23:48 App\Events\CommentCreated ................ 277.61ms DONE
+  2024-06-10 14:40:10 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:40:10 App\Events\CommentCreated ................ 305.16ms DONE
+  2024-06-10 14:41:16 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:41:17 App\Events\CommentCreated ................ 339.58ms DONE
+  2024-06-10 14:43:19 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:43:20 App\Events\CommentCreated ................ 298.69ms DONE
+  2024-06-10 14:43:35 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:43:35 App\Events\CommentCreated ................ 269.75ms DONE
+  2024-06-10 14:56:21 App\Jobs\ProcessFile ........................... RUNNING
+  2024-06-10 14:56:21 App\Jobs\ProcessFile ...................... 80.79ms FAIL
+  2024-06-10 14:56:23 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 14:56:24 App\Events\CommentCreated ................ 319.93ms DONE
+  2024-06-10 14:58:03 App\Jobs\ProcessFile ........................... RUNNING
+  2024-06-10 14:58:03 App\Jobs\ProcessFile ...................... 20.68ms FAIL
+  2024-06-10 15:05:27 App\Jobs\ProcessFile ........................... RUNNING
+  2024-06-10 15:05:27 App\Jobs\ProcessFile ...................... 13.31ms FAIL
+  2024-06-10 15:05:30 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 15:05:31 App\Events\CommentCreated ................ 290.41ms DONE
+  2024-06-10 15:10:34 App\Jobs\ProcessFile ........................... RUNNING
+  2024-06-10 15:10:34 App\Jobs\ProcessFile ...................... 14.37ms FAIL
+  2024-06-10 15:10:37 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 15:10:37 App\Events\CommentCreated ................ 340.82ms DONE
+  2024-06-10 15:41:26 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 15:41:26 App\Events\CommentCreated ................ 291.17ms DONE
+  2024-06-10 15:44:20 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 15:44:21 App\Events\CommentCreated ................ 287.34ms DONE
+  2024-06-10 16:10:04 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 16:10:04 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  13.93ms FAIL
+  2024-06-10 16:10:04 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 16:10:04 App\Events\CommentCreated ................ 290.09ms DONE
+  2024-06-10 17:06:58 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:06:58 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  15.03ms FAIL
+  2024-06-10 17:17:40 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:17:40 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  11.86ms FAIL
+  2024-06-10 17:17:40 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:17:40 App\Events\CommentCreated ................ 309.40ms DONE
+  2024-06-10 17:21:50 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:21:50 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  13.73ms FAIL
+  2024-06-10 17:21:52 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:21:53 App\Events\CommentCreated ................ 302.72ms DONE
+  2024-06-10 17:23:20 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:23:20 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  10.75ms FAIL
+  2024-06-10 17:23:23 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:23:23 App\Events\CommentCreated ................ 289.71ms DONE
+  2024-06-10 17:27:14 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:27:14 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  14.42ms FAIL
+  2024-06-10 17:27:17 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:27:17 App\Events\CommentCreated ................ 289.14ms DONE
+  2024-06-10 17:28:08 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:28:08 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  8.31ms FAIL
+  2024-06-10 17:28:08 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:28:09 App\Events\CommentCreated ................ 270.81ms DONE
+  2024-06-10 17:39:06 App\Events\CommentCreated ...................... RUNNING
+  2024-06-10 17:39:06 App\Events\CommentCreated ................ 305.46ms DONE
+  2024-06-10 17:41:18 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  RUNNING
+  2024-06-10 17:41:18 Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob  12.65ms FAIL

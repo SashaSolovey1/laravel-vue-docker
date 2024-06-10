@@ -16,6 +16,7 @@
         "mews/captcha": "^3.3",
         "predis/predis": "^2.2",
         "pusher/pusher-php-server": "^7.2",
+        "spatie/laravel-medialibrary": "^11.5",
         "symfony/filesystem": "^7.1"
     },
     "require-dev": {
