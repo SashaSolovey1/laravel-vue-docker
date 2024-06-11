@@ -1,9 +1,7 @@
 <?php
 
-use App\Http\Controllers\CaptchaController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,12 +20,9 @@ Route::resources([
 
 Route::post('comments/validate', [CommentController::class, 'validateComment']);
 
-
 Route::prefix('comments')->group(function () {
     Route::put('/{comment}/increase-rating', [CommentController::class, 'increaseRating']);
     Route::put('/{comment}/decrease-rating', [CommentController::class, 'decreaseRating']);
 });
 
 Route::get('/comments/{id}', [CommentController::class, 'show']);
-
-

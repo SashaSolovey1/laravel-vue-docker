@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\Image\Enums\Fit;
 
 class Comment extends Model implements HasMedia
 {
@@ -40,11 +39,11 @@ class Comment extends Model implements HasMedia
     }
 
     // Регистрация преобразования медиафайлов
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
-	     ->addMediaConversion('thumb')
-             ->width(320)
-	     ->height(240);
+            ->addMediaConversion('thumb')
+            ->width(320)
+            ->height(240);
     }
 }

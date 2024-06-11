@@ -2,13 +2,13 @@
 
 namespace App\Events;
 
+use App\Mail\CommentNotification;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\CommentNotification;
 
 class CommentCreated implements ShouldBroadcast
 {
@@ -19,7 +19,7 @@ class CommentCreated implements ShouldBroadcast
     public function __construct($comment)
     {
         $this->comment = $comment;
-        
+
         // Отправка мейла
         Mail::to('solo160103@gmail.com')->send(new CommentNotification($comment));
     }

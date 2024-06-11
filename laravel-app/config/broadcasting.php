@@ -17,7 +17,6 @@ return [
 
     'default' => env('BROADCAST_DRIVER', 'null'),
 
-
     /*
     |--------------------------------------------------------------------------
     | Broadcast Connections
@@ -31,7 +30,7 @@ return [
 
     'connections' => [
 
-	'pusher' => [
+        'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
@@ -41,8 +40,6 @@ return [
                 'encrypted' => true,
             ],
         ],
-
-
 
         'ably' => [
             'driver' => 'ably',

@@ -89,7 +89,6 @@ return [
 
     'custom_path_generator_class' => \App\PathGenerators\CustomPathGenerator::class,
 
-
     /*
      * When urls to files get generated, this class will be called. Use the default
      * if your files are stored locally above the site root or on s3.

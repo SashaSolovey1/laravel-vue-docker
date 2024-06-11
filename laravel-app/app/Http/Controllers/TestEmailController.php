@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Mail;
 
 class TestEmailController extends Controller
 {
@@ -12,6 +11,7 @@ class TestEmailController extends Controller
     {
         // Вставьте свой почтовый адрес
         Mail::to('solo160103@gmail.com')->send(new TestEmail());
+
         return 'Test email sent!';
     }
 }

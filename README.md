@@ -71,9 +71,15 @@
 14. Якщо у вас виникають помилки на сайті `Failed to load resource: net::ERR_CONNECTION_REFUSED`, видаліть файл `public/hot`.
 
 15. Для використання івенту відправки листа на пошту після додання коментаря:
+<<<<<<< HEAD
     - В файлі `.env` введіть валідні дані SMTP Mailtrap або іншої служби.
     - В контролері `app/Http/Controllers/TestEmailController.php` та в івенті `app/Events/CommentCreated.php` замініть адресу пошти на вашу поточну.
     - Перевірте роботу SMTP за посиланням `/send-test-email`.
+=======
+   - В файлі `.env` введіть валідні дані SMTP Mailtrap або іншої служби.
+   - В контролері `app/Http/Controllers/TestEmailController.php` та в івенті `app/Events/CommentCreated.php` замініть адресу пошти на вашу поточну.
+   - Перевірте роботу SMTP за посиланням `/send-test-email`.
+>>>>>>> e6b5934 (add code styling with laravel/pint)
 
 
 

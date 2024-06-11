@@ -209,6 +209,6 @@ return [
 
     'partitioned' => false,
 
-'driver' => env('SESSION_DRIVER', 'redis'),
-'connection' => 'default',
+    'driver' => env('SESSION_DRIVER', 'redis'),
+    'connection' => 'default',
 ];

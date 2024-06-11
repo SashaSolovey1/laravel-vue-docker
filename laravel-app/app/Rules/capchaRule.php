@@ -17,7 +17,6 @@ class capchaRule implements ValidationRule
         //
     }
 
-    
     public static function validateCaptcha($captcha)
     {
         return captcha_check($captcha);
