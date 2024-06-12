@@ -9,15 +9,16 @@
 
 2. Перейменуйте файл `.env.example` в `.env` та налаштуйте його відповідно до вашого оточення.
 
-3. Встановіть nvm:
-   ```sh
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-   ```
 
-4. Запустіть проект в контейнері Docker Compose командами:
+3. Запустіть проект в контейнері Docker Compose командами:
    ```sh
    docker-compose build --no-cache --force-rm
    docker-compose up -d
+   ```
+
+4. Встановіть nvm:
+   ```sh
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
    ```
 
 5. Ввійдіть в контейнер:
