@@ -97,19 +97,38 @@ class CommentController extends Controller
             'username' => 'required|string',
             'email' => 'required|email',
             'homepage' => 'nullable|url',
-            'text' => 'required|string',
+            'text' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if ($value !== strip_tags($value)) {
+                        $fail('HTML теги должны быть закрыты.');
+                    }
+                },
+            ],
             'file' => 'sometimes|mimes:jpg,gif,png,txt|max:10240',
             'captcha' => 'required|captcha_api:'.request('key').',math',
         ];
 
-        $validator = validator()->make(request()->all(), $rules);
+        $messages = [
+            'username.required' => 'Имя пользователя обязательно.',
+            'email.required' => 'Электронная почта обязательна.',
+            'email.email' => 'Неправильный формат электронной почты.',
+            'homepage.url' => 'Домашняя страница должна быть валидным URL.',
+            'text.required' => 'Текст обязателен.',
+            'file.mimes' => 'Файл должен быть в формате: jpg, gif, png или txt.',
+            'file.max' => 'Файл не должен превышать 10MB.',
+            'captcha.required' => 'Капча обязательна.',
+            'captcha.captcha_api' => 'Капча неверна, попробуйте обновить.',
+        ];
+
+        $validator = validator()->make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['errors' => $validator->errors()->all()], 422);
         } else {
             return $this->storeComment($request);
         }
-
     }
 
     /**

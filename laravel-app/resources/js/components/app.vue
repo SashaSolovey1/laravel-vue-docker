@@ -163,7 +163,7 @@ export default {
                 this.$router.push('/');
             } catch (error) {
                 if (error.response && error.response.data.errors) {
-                    this.errorMessage = Object.values(error.response.data.errors).flat().join('\n');
+                    this.errorMessage = error.response.data.errors.join('\n');
                 } else {
                     console.error(error);
                 }
