@@ -9,35 +9,35 @@
 
 2. Перейменуйте файл `.env.example` в `.env` та налаштуйте його відповідно до вашого оточення.
 
-3. Запустіть проект в контейнері Docker Compose командами:
+3. Встановіть nvm:
+   ```sh
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+   ```
+
+4. Запустіть проект в контейнері Docker Compose командами:
    ```sh
    docker-compose build --no-cache --force-rm
    docker-compose up -d
    ```
 
-4. Ввійдіть в контейнер:
+5. Ввійдіть в контейнер:
    ```sh
    docker exec -it laravel-docker bash
    ```
 
-5. Оновіть Composer всередині контейнера:
+6. Оновіть Composer всередині контейнера:
    ```sh
    composer update --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-exif
    ```
 
-6. Зробіть міграцію БД командою:
+7. Зробіть міграцію БД командою:
    ```sh
    php artisan migrate
    ```
 
-7. Виконайте заповнення початковими даними (seed) БД командою:
+8. Виконайте заповнення початковими даними (seed) БД командою:
    ```sh
    php artisan db:seed
-   ```
-
-8. Встановіть nvm:
-   ```sh
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
    ```
 
 9. Встановіть Node.js та всі необхідні модулі:
@@ -46,9 +46,10 @@
    npm install
    ```
 
-10. Встановіть PM2:
+10. Встановіть PM2 та Laravel-echo:
     ```sh
     npm install pm2 -g
+    npm install -g laravel-echo-server
     ```
 
 11. Запустіть процеси за допомогою PM2:
@@ -71,19 +72,9 @@
 14. Якщо у вас виникають помилки на сайті `Failed to load resource: net::ERR_CONNECTION_REFUSED`, видаліть файл `public/hot`.
 
 15. Для використання івенту відправки листа на пошту після додання коментаря:
-<<<<<<< HEAD
-    - В файлі `.env` введіть валідні дані SMTP Mailtrap або іншої служби.
-    - В контролері `app/Http/Controllers/TestEmailController.php` та в івенті `app/Events/CommentCreated.php` замініть адресу пошти на вашу поточну.
-    - Перевірте роботу SMTP за посиланням `/send-test-email`.
-=======
    - В файлі `.env` введіть валідні дані SMTP Mailtrap або іншої служби.
    - В контролері `app/Http/Controllers/TestEmailController.php` та в івенті `app/Events/CommentCreated.php` замініть адресу пошти на вашу поточну.
    - Перевірте роботу SMTP за посиланням `/send-test-email`.
->>>>>>> e6b5934 (add code styling with laravel/pint)
-
-
-
-
 
 ## Опис проекту
 
@@ -96,8 +87,3 @@
 При додаванні нового коментаря від користувача, якого не існує в системі, він автоматично реєструється. Для капчі використовується бібліотека MeWebStudio/Captcha, яка створює зображення та ключ на бекенді і передає їх на фронт для валідації.
 
 Цей проект забезпечує швидку та зручну взаємодію користувачів у режимі реального часу, забезпечуючи високу продуктивність та зручність використання.
-
-## Схема бази даних
-
-![laravel_docker](https://github.com/SashaSolovey1/laravel-vue-docker/assets/72560323/e8d54ecb-b2f8-4cb9-bbd5-50bf3947c78e)
-
