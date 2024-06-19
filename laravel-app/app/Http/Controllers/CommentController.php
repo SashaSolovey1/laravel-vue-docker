@@ -6,6 +6,7 @@ use App\Events\CommentCreated;
 use App\Events\CommentRatingChanged;
 use App\Models\Comment;
 use App\Models\User;
+use App\Rules\ValidHtmlTags;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -97,15 +98,7 @@ class CommentController extends Controller
             'username' => 'required|string',
             'email' => 'required|email',
             'homepage' => 'nullable|url',
-            'text' => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) {
-                    if ($value !== strip_tags($value)) {
-                        $fail('HTML теги должны быть закрыты.');
-                    }
-                },
-            ],
+            'text' =>['required', new ValidHtmlTags()],
             'file' => 'sometimes|mimes:jpg,gif,png,txt|max:10240',
             'captcha' => 'required|captcha_api:'.request('key').',math',
         ];
