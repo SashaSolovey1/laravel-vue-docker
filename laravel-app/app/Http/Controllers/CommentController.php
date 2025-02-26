@@ -23,15 +23,12 @@ class CommentController extends Controller
         $sortBy = $request->query('sortBy', 'created_at');
         $sortDirection = $request->query('sortDirection', 'desc');
 
-        // Создание уникального ключа кэша на основе параметров запроса
         $cacheKey = 'comments_'.$sortBy.'_'.$sortDirection.'_'.$request->query('page', 1);
 
-        // Попытка получить данные из кэша
         $comments = Cache::remember($cacheKey, 600, function () use ($sortBy, $sortDirection) {
             $commentsQuery = Comment::with(['replies.user', 'user', 'media', 'replies.media'])
                 ->whereNull('parent_id');
 
-            // Добавление сортировки
             if ($sortBy === 'username') {
                 $commentsQuery->leftJoin('users', 'comments.user_id', '=', 'users.id')
                     ->orderBy('users.username', $sortDirection);
@@ -42,15 +39,12 @@ class CommentController extends Controller
                 $commentsQuery->orderBy($sortBy, $sortDirection);
             }
 
-            // Получение комментариев с пагинацией
             $comments = $commentsQuery->paginate(25);
 
-            // Преобразование коллекции комментариев
             $comments->getCollection()->transform(function ($comment) {
                 $username = $comment->user ? $comment->user->username : 'Anonymous';
                 $email = $comment->user ? $comment->user->email : '';
 
-                // Трансформация ответов
                 $replies = $comment->replies->map(function ($reply) {
                     $replyUsername = $reply->user ? $reply->user->username : 'Anonymous';
                     $replyEmail = $reply->user ? $reply->user->email : '';
@@ -165,7 +159,6 @@ class CommentController extends Controller
 
         $comment->save();
 
-        // Трансляция по вебсокету и отправка мейла
         event(new CommentCreated($comment));
 
         Cache::forget('comments_'.'created_at'.'_desc'.'_1');
@@ -183,6 +176,7 @@ class CommentController extends Controller
         $comment->increment('rating');
 
         event(new CommentRatingChanged($comment));
+        Cache::forget('comments_'.'created_at'.'_desc'.'_1');
 
         return response()->json($comment, 200);
     }
@@ -197,6 +191,7 @@ class CommentController extends Controller
         $comment->decrement('rating');
 
         event(new CommentRatingChanged($comment));
+        Cache::forget('comments_'.'created_at'.'_desc'.'_1');
 
         return response()->json($comment, 200);
     }

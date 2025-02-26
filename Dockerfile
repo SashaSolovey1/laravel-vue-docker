@@ -16,6 +16,9 @@ RUN apt-get update -y && apt-get install -y \
     libjpeg62-turbo-dev \
     libpng-dev
 
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
+
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

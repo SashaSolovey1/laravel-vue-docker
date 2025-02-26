@@ -1,26 +1,28 @@
 services:
   laravel-docker:
-    container_name: laravel-docker
+    container_name: laravel-docker-vue
     build: .
     volumes:
       - ./laravel-app:/var/www/html
     ports:
       - 9000:80
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+
 
   mysql_db:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel_docker
+      MYSQL_DATABASE: laravel_docker_vue
     ports:
-      - 3306:3306
-
-  phpmyadmin:
-    image: phpmyadmin:latest
-    ports:
-      - 9001:80
-    environment:
-      - PMA_ARBITRARY=1
+      - 3308:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:latest
