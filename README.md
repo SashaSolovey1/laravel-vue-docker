@@ -2,14 +2,15 @@
 
 Для успішного налаштування та запуску вашого проєкту виконайте наступні кроки:
 
-1. **Завантажте репозиторій:**
+1. **Завантажте репозиторій та перейдіть в папку проекту:**
    ```sh
    git clone https://github.com/SashaSolovey1/laravel-vue-docker.git
+   cd laravel-vue-docker
    ```
 
 2. **Перейменуйте `.env.example` в `.env`:**
    ```sh
-   cp .env.example .env
+     cp laravel-app/.env.example laravel-app/.env
    ```
 
 3. **Запустіть повну збірку проєкту:**
